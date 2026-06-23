@@ -13,7 +13,7 @@ export default function App() {
     {
       role: "assistant",
       content:
-        "👋 Hi! I'm **Kapi**, your Kapruka shopping assistant!\n\nI can help you find gifts 🎁, check delivery 🚚, and complete your order 🛒\n\nWhat are you looking for today?",
+        "👋 Hi! I'm **Kapru**, your Kapruka shopping assistant!\n\nI can help you find gifts 🎁, check delivery 🚚, and complete your order 🛒\n\nWhat are you looking for today?",
     },
   ]);
 

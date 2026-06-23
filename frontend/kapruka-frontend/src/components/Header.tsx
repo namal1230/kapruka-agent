@@ -5,7 +5,7 @@ export default function Header() {
         🛍️
       </div>
       <div>
-        <h1 className="text-white font-bold text-lg leading-none">Kapi</h1>
+        <h1 className="text-white font-bold text-lg leading-none">Kapru</h1>
         <span className="text-purple-300 text-xs">● Online — Kapruka Assistant</span>
       </div>
     </div>
