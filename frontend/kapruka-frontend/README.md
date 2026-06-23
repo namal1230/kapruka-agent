@@ -1,73 +1,113 @@
-# React + TypeScript + Vite
+```markdown
+# Kapru — Kapruka AI Shopping Assistant (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, immersive React + Three.js chat interface for the Kapruka Agent Challenge.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 🌍 Rotating 3D globe background with Three.js
+- 💬 Full-screen conversational chat UI
+- 🛍️ Product cards with images and prices
+- ⭐ Animated star field background
+- 💜 Beautiful purple gradient design
+- 📱 Mobile responsive
+- ⚡ Fast and smooth animations
+- 🎁 Smart shopping suggestions
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 18 — UI framework
+- TypeScript — Type safety
+- Vite — Build tool
+- Tailwind CSS — Styling
+- Three.js — 3D graphics
+- @react-three/fiber — React renderer for Three.js
+- @react-three/drei — Three.js helpers
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📁 Project Structure
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+    frontend/
+    ├── src/
+    │   ├── components/
+    │   │   ├── Globe.tsx
+    │   │   ├── Header.tsx
+    │   │   ├── ChatWindow.tsx
+    │   │   ├── MessageBubble.tsx
+    │   │   ├── ProductCard.tsx
+    │   │   └── TypingIndicator.tsx
+    │   ├── App.tsx
+    │   ├── main.tsx
+    │   └── index.css
+    ├── vite.config.ts
+    ├── tsconfig.json
+    └── package.json
+
+
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- npm
+
+### Installation
+
+```bash
+npm install
 ```
+
+### Development
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173)
+
+### Production Build
+
+```bash
+npm run build
+```
+
+## ⚙️ Environment Variables
+
+Create `.env` in frontend folder:
+
+```
+VITE_API_URL=https://your-backend.onrender.com
+```
+
+Leave empty for local development.
+
+## 🚢 Deployment — Vercel
+
+1. Go to [vercel.com](https://vercel.com)
+2. Connect your GitHub repo
+3. Set root directory → `frontend`
+4. Add env variable `VITE_API_URL`
+5. Click Deploy ✅
+
+Auto-deploys on every push to master.
+
+## 🔗 Backend
+
+See [backend/README.md](../backend/README.md)
+Backend runs on Render.com
+
+## 🏆 Built For
+
+**Kapruka Agent Challenge 2026**
+- Challenge: [kapruka.com](https://kapruka.com)
+- MCP docs: [mcp.kapruka.com](https://mcp.kapruka.com)
+
+## 👤 Author
+
+**Namal Dilmith Ruwanpathirana**
+- GitHub: [@namal1230](https://github.com/namal1230)
+
+---
+© 2026 Kapruka Agent Challenge
