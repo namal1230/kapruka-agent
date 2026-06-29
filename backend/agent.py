@@ -1,4 +1,4 @@
-import anthropic
+import google.generativeai as genai
 import httpx
 import json
 import os
@@ -6,17 +6,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = anthropic.Anthropic(
-    api_key=os.getenv("ANTHROPIC_API_KEY")
-)
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 MCP_URL = "https://mcp.kapruka.com/mcp"
 
 TOOLS = [
     {
         "name": "kapruka_search_products",
-        "description": "Search Kapruka products by keyword, category, price range. Use this when user asks for any product.",
-        "input_schema": {
+        "description": "Search Kapruka products by keyword, category, price range.",
+        "parameters": {
             "type": "object",
             "properties": {
                 "q": {
@@ -35,17 +33,13 @@ TOOLS = [
                     "type": "number",
                     "description": "Maximum price"
                 },
-                "in_stock_only": {
-                    "type": "boolean",
-                    "description": "Only show in stock items"
-                },
                 "limit": {
                     "type": "integer",
                     "description": "Number of results"
                 },
                 "currency": {
                     "type": "string",
-                    "default": "LKR"
+                    "description": "Currency code like LKR"
                 }
             },
             "required": ["q"]
@@ -53,17 +47,17 @@ TOOLS = [
     },
     {
         "name": "kapruka_get_product",
-        "description": "Get full details of a specific product by ID including images, variants, shipping info",
-        "input_schema": {
+        "description": "Get full details of a product by ID",
+        "parameters": {
             "type": "object",
             "properties": {
                 "product_id": {
                     "type": "string",
-                    "description": "Product ID from search results"
+                    "description": "Product ID"
                 },
                 "currency": {
                     "type": "string",
-                    "default": "LKR"
+                    "description": "Currency code like LKR"
                 }
             },
             "required": ["product_id"]
@@ -71,21 +65,21 @@ TOOLS = [
     },
     {
         "name": "kapruka_list_categories",
-        "description": "List all available product categories on Kapruka",
-        "input_schema": {
+        "description": "List all product categories on Kapruka",
+        "parameters": {
             "type": "object",
             "properties": {
                 "depth": {
                     "type": "integer",
-                    "description": "Depth of category tree"
+                    "description": "Category tree depth"
                 }
             }
         }
     },
     {
         "name": "kapruka_list_delivery_cities",
-        "description": "Search delivery cities available in Sri Lanka",
-        "input_schema": {
+        "description": "Search delivery cities in Sri Lanka",
+        "parameters": {
             "type": "object",
             "properties": {
                 "query": {
@@ -101,8 +95,8 @@ TOOLS = [
     },
     {
         "name": "kapruka_check_delivery",
-        "description": "Check if delivery is possible to a city on a specific date for a product",
-        "input_schema": {
+        "description": "Check if delivery is possible to a city on a date",
+        "parameters": {
             "type": "object",
             "properties": {
                 "city": {
@@ -111,11 +105,11 @@ TOOLS = [
                 },
                 "delivery_date": {
                     "type": "string",
-                    "description": "Delivery date in YYYY-MM-DD format"
+                    "description": "Date in YYYY-MM-DD format"
                 },
                 "product_id": {
                     "type": "string",
-                    "description": "Product ID to check"
+                    "description": "Product ID"
                 }
             },
             "required": ["city", "delivery_date", "product_id"]
@@ -123,47 +117,36 @@ TOOLS = [
     },
     {
         "name": "kapruka_create_order",
-        "description": "Create a guest checkout order and return a click-to-pay link. No Kapruka account needed.",
-        "input_schema": {
+        "description": "Create guest checkout order and return payment link",
+        "parameters": {
             "type": "object",
             "properties": {
                 "cart": {
                     "type": "array",
-                    "description": "List of items with product_id and quantity",
+                    "description": "List of products",
                     "items": {
                         "type": "object",
                         "properties": {
-                            "product_id": {"type": "string"},
-                            "quantity": {"type": "integer"}
+                            "product_id": {
+                                "type": "string"
+                            },
+                            "quantity": {
+                                "type": "integer"
+                            }
                         }
                     }
                 },
                 "recipient": {
-                    "type": "object",
-                    "description": "Recipient details",
-                    "properties": {
-                        "name": {"type": "string"},
-                        "phone": {"type": "string"},
-                        "address": {"type": "string"},
-                        "city": {"type": "string"}
-                    }
+                    "type": "string",
+                    "description": "Recipient details as JSON string with name, phone, address, city"
                 },
                 "delivery": {
-                    "type": "object",
-                    "description": "Delivery details",
-                    "properties": {
-                        "date": {"type": "string"},
-                        "time_slot": {"type": "string"}
-                    }
+                    "type": "string",
+                    "description": "Delivery details as JSON string with date"
                 },
                 "sender": {
-                    "type": "object",
-                    "description": "Sender details",
-                    "properties": {
-                        "name": {"type": "string"},
-                        "phone": {"type": "string"},
-                        "email": {"type": "string"}
-                    }
+                    "type": "string",
+                    "description": "Sender details as JSON string with name, phone, email"
                 },
                 "gift_message": {
                     "type": "string",
@@ -171,7 +154,7 @@ TOOLS = [
                 },
                 "currency": {
                     "type": "string",
-                    "default": "LKR"
+                    "description": "Currency code like LKR"
                 }
             },
             "required": ["cart", "recipient", "delivery"]
@@ -179,13 +162,13 @@ TOOLS = [
     },
     {
         "name": "kapruka_track_order",
-        "description": "Track an existing Kapruka order status and delivery progress",
-        "input_schema": {
+        "description": "Track existing Kapruka order by order number",
+        "parameters": {
             "type": "object",
             "properties": {
                 "order_number": {
                     "type": "string",
-                    "description": "Order number from confirmation email"
+                    "description": "Order number from confirmation"
                 }
             },
             "required": ["order_number"]
@@ -273,61 +256,79 @@ async def call_mcp_tool(tool_name: str, tool_input: dict):
 
 
 async def chat(messages: list) -> str:
-    """Main chat function with tool calling"""
+    """Chat with Gemini + Kapruka MCP tools"""
     try:
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1024,
-            system=SYSTEM_PROMPT,
-            tools=TOOLS,
-            messages=messages
+        model = genai.GenerativeModel(
+            model_name="gemini-2.0-flash",
+            system_instruction=SYSTEM_PROMPT,
+            tools=[{"function_declarations": TOOLS}]
         )
 
-        while response.stop_reason == "tool_use":
+        gemini_history = []
+        for msg in messages[:-1]:
+            role = "user" if msg["role"] == "user" else "model"
+            gemini_history.append({
+                "role": role,
+                "parts": [msg["content"]]
+            })
+
+        chat_session = model.start_chat(
+            history=gemini_history
+        )
+
+        last_message = messages[-1]["content"]
+        response = chat_session.send_message(last_message)
+
+        max_iterations = 5
+        iteration = 0
+
+        while iteration < max_iterations:
+            iteration += 1
+            tool_calls = []
+
+            for part in response.parts:
+                if hasattr(part, "function_call") and part.function_call.name:
+                    tool_calls.append(part.function_call)
+
+            if not tool_calls:
+                break
+
             tool_results = []
+            for tool_call in tool_calls:
+                tool_name = tool_call.name
+                tool_input = dict(tool_call.args)
 
-            for block in response.content:
-                if block.type == "tool_use":
-                    print(f"🔧 Tool: {block.name}")
-                    print(f"📥 Input: {block.input}")
+                print(f"🔧 Calling: {tool_name}")
+                print(f"📥 Input: {tool_input}")
 
-                    result = await call_mcp_tool(
-                        block.name,
-                        block.input
+                result = await call_mcp_tool(
+                    tool_name,
+                    tool_input
+                )
+
+                tool_results.append(
+                    genai.protos.Part(
+                        function_response=genai.protos.FunctionResponse(
+                            name=tool_name,
+                            response={
+                                "result": json.dumps(result)
+                            }
+                        )
                     )
+                )
 
-                    tool_results.append({
-                        "type": "tool_result",
-                        "tool_use_id": block.id,
-                        "content": json.dumps(result)
-                    })
-
-            messages = messages + [
-                {
-                    "role": "assistant",
-                    "content": response.content
-                },
-                {
-                    "role": "user",
-                    "content": tool_results
-                }
-            ]
-
-            response = client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=1024,
-                system=SYSTEM_PROMPT,
-                tools=TOOLS,
-                messages=messages
+            response = chat_session.send_message(
+                tool_results
             )
 
         final_text = ""
-        for block in response.content:
-            if hasattr(block, "text"):
-                final_text += block.text
+        for part in response.parts:
+            if hasattr(part, "text") and part.text:
+                final_text += part.text
 
-        return final_text
+        return final_text if final_text else \
+            "Sorry, I could not process that. Please try again!"
 
     except Exception as e:
-        print(f"Chat Error: {e}")
-        return f"Sorry, I encountered an error: {str(e)}"
+        print(f"❌ Chat Error: {e}")
+        return f"Sorry, something went wrong: {str(e)}"

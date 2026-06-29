@@ -7,7 +7,7 @@ import uvicorn
 import os
 
 app = FastAPI(
-    title="Kapi — Kapruka Shopping Agent",
+    title="Kapru — Kapruka Shopping Agent",
     description="AI-powered shopping assistant for Kapruka.com",
     version="1.0.0"
 )
@@ -54,7 +54,7 @@ async def chat_endpoint(request: ChatRequest):
 async def health_check():
     return {
         "status": "ok",
-        "service": "Kapi Backend",
+        "service": "Kapru Backend",
         "version": "1.0.0"
     }
 
@@ -62,7 +62,7 @@ async def health_check():
 @app.get("/")
 async def root():
     return {
-        "message": "Kapi — Kapruka AI Shopping Assistant",
+        "message": "Kapru — Kapruka AI Shopping Assistant",
         "docs": "/docs",
         "health": "/health"
     }

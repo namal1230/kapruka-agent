@@ -1,5 +1,6 @@
 fastapi
 uvicorn
-anthropic
+google-generativeai
 httpx
 python-dotenv
+protobuf
